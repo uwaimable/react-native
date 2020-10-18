@@ -26,6 +26,7 @@ class About extends Component {
                 />
             );
         };
+        // return the flatlist
         return (
             <ScrollView>
                 <Mission />
