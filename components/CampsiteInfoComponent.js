@@ -3,7 +3,7 @@ import { Text, View, ScrollView, FlatList } from 'react-native';
 import { Card, Icon, Input, Rating } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
-import { postFavorite, postComment } from '../redux/ActionCreators';
+import { postFavorite} from '../redux/ActionCreators';
 import { Button, Modal,StyleSheet} from 'react-native';
 
 const mapStateToProps = state => {
@@ -92,7 +92,7 @@ class CampsiteInfo extends Component {
         this.setState({ showModal: !this.state.showModal })
 
     }
-    handleComment(campsiteId) {
+    handleComment() {
         this.toggleModal();
         this.props.postComment(this.props.campsiteId, values.rating, values.author, values.text);
     }
