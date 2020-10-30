@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList,Modal,Button,StyleSheet,Alert,PanResponder } from 'react-native';
+import { Text, View, ScrollView, FlatList,Modal,Button,StyleSheet,Alert,PanResponder,Share} from 'react-native';
 import { Card, Icon, Input, Rating } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
-import { postFavorite} from '../redux/ActionCreators';
+import { postFavorite,postComment} from '../redux/ActionCreators';
 import * as Animatable from 'react-native-animatable';
 
 const mapStateToProps = state => {
@@ -16,17 +16,15 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
     postFavorite: campsiteId => (postFavorite(campsiteId)),
-    postComment: postComment => (postComment(campsiteId, rating, author, text))
+    postComment: (campsiteId, rating, author, text, date) => (postComment(campsiteId, rating, author, text, date))
 };
 
-
 function RenderCampsite(props) {
+    const recognizeComment = ({ dx }) => (dx < 200) ? true : false;
 
     const { campsite } = props;
-
-    const view = React.createRef();
-
     const recognizeDrag = ({ dx }) => (dx < -200) ? true : false;
+    const view = React.createRef();
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -55,6 +53,10 @@ function RenderCampsite(props) {
                     { cancelable: false }
                 );
             }
+
+            else if (recognizeComment(gestureState)) {
+                props.showModal()
+            }
             return true;
         }
     });
@@ -74,7 +76,8 @@ function RenderCampsite(props) {
 
                 <Text style={{ margin: 10 }}>
                     {campsite.description}
-                </Text>
+                    </Text>
+                    <View style={styles.cardRow}>
                 <Icon name={props.favorite ? 'heart' : 'heart-o'}
                     type='font-awesome'
                     color='#f50'
@@ -89,7 +92,8 @@ function RenderCampsite(props) {
                     raised
                     reverse
                     onPress={() => props.onShowModal()}
-                />
+                    />
+                        </View>
                 </Card>
             </Animatable.View>
         );
@@ -98,16 +102,22 @@ function RenderCampsite(props) {
 }
 
 function RenderComments({ comments }) {
+
     const renderCommentItem = ({ item }) => {
         return (
             <View style={{ margin: 10 }}>
                 <Text style={{ fontSize: 14 }}>{item.text}</Text>
-                <Text style={{ fontSize: 12 }}>{item.rating} Stars</Text>
+                <Rating
+                    staringValue={item.rating}
+                    imageSize={10}
+                    style={{ alignItems: 'flex-start', paddingVertical: '5%' }}
+                    read-only
+                />
                 <Text style={{ fontSize: 12 }}>{`-- ${item.author}, ${item.date}`}</Text>
             </View>
         );
-
     };
+
     return (
         <Animatable.View animation='fadeInUp' duration={2000} delay={1000}>
         <Card title="Comments">
@@ -139,10 +149,13 @@ class CampsiteInfo extends Component {
         this.setState({ showModal: !this.state.showModal })
 
     }
-    handleComment() {
+    
+    handleComment(campsiteId) {
+        const date = new Date().toISOString();
+        this.props.postComment(campsiteId, this.state.rating, this.state.author, this.state.text, date);
         this.toggleModal();
-        this.props.postComment(this.props.campsiteId, values.rating, values.author, values.text);
     }
+
     resetForm() {
         this.setState({
             rating: 5,

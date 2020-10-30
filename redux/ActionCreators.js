@@ -26,7 +26,19 @@ export const commentsFailed = errMess => ({
     payload: errMess
 });
 
-export const addComments = comments => ({
+export const postComment = (comment) => dispatch => {
+    
+    setTimeout(() => {
+        dispatch(addComment(comment));
+    }, 2000);
+};
+
+export const addComment = comment => ({
+    type: ActionTypes.ADD_COMMENT,
+    payload: comment
+});
+
+export const addComments = (comments) => ({
     type: ActionTypes.ADD_COMMENTS,
     payload: comments
 });
@@ -157,3 +169,4 @@ export const deleteFavorite = campsiteId => ({
     type: ActionTypes.DELETE_FAVORITE,
     payload: campsiteId
 }); 
+
