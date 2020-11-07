@@ -20,7 +20,7 @@ const mapDispatchToProps = {
 };
 
 function RenderCampsite(props) {
-    const recognizeComment = ({ dx }) => (dx < 200) ? true : false;
+    const recognizeComment = ({ dx }) => (dx > 200) ? true : false;
 
     const { campsite } = props;
     const recognizeDrag = ({ dx }) => (dx < -200) ? true : false;
@@ -61,6 +61,16 @@ function RenderCampsite(props) {
         }
     });
 
+    const shareCampsite = (title, message, url) => {
+        Share.share({
+            title: title,
+            message: `${title}: ${message} ${url}`,
+            url: url
+        }, {
+            dialogTitle: 'Share ' + title
+        });
+    };
+
     if (campsite) {
         return (
             <Animatable.View
@@ -92,7 +102,15 @@ function RenderCampsite(props) {
                     raised
                     reverse
                     onPress={() => props.onShowModal()}
-                    />
+                        />
+                        <Icon
+                            name={'share'}
+                            type='font-awesome'
+                            color='#5637DD'
+                            raised
+                            reverse
+                            onPress={() => shareCampsite(campsite.name, campsite.description, baseUrl + campsite.image)}
+                        />
                         </View>
                 </Card>
             </Animatable.View>
@@ -189,6 +207,26 @@ class CampsiteInfo extends Component {
                     onRequestClose={() => this.toggleModal()}
                 >
                     <View style={styles.modal}>
+                        <View style={{ margin: 10 }}>
+                            <Button
+                                onPress={() => {
+                                    this.handleComment(campsiteId);
+                                    this.resetForm();
+                                }}
+                                color='#5637DD'
+                                title='Submit'
+                            />
+                        </View>
+                        <View style={{ margin: 10 }}>
+                            <Button
+                                onPress={() => {
+                                    this.toggleModal();
+                                    this.resetForm();
+                                }}
+                                color='#808080'
+                                title='Cancel'
+                            />
+                        </View>
                         <Rating
                             showRating
                             fractions={0}
@@ -211,26 +249,7 @@ class CampsiteInfo extends Component {
                             onChangeText={text => { this.setState({ text: text }) }}
                             value={this.state.text}
                         />
-                        <View style={{ margin: 10 }}>
-                            <Button
-                                onPress={() => {
-                                    this.handleComment(campsiteId);
-                                    this.resetForm();
-                                }}
-                                color='#5637DD'
-                                title='Submit'
-                            />
-                        </View>
-                        <View style={{ margin: 10 }}>
-                            <Button
-                                onPress={() => {
-                                    this.toggleModal();
-                                    this.resetForm();
-                                }}
-                                color='#808080'
-                                title='Cancel'
-                            />
-                        </View>
+                        
                     </View>
                 </Modal>
 
